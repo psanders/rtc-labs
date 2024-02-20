@@ -18,6 +18,7 @@ class Phone {
         this.callButton = (0, utils_1.getButton)("callButton");
         this.displayNameInput = (0, utils_1.getInput)("displayNameInput");
         this.usernameInput = (0, utils_1.getInput)("usernameInput");
+        this.authorizationUserInput = (0, utils_1.getInput)("authorizationUserInput");
         this.passwordInput = (0, utils_1.getInput)("passwordInput");
         this.domainInput = (0, utils_1.getInput)("domainInput");
         this.serverInput = (0, utils_1.getInput)("serverInput");
@@ -28,90 +29,81 @@ class Phone {
         this.connectButton.addEventListener("click", this.connect.bind(this));
         this.registerButton.addEventListener("click", this.register.bind(this));
         this.callButton.addEventListener("click", this.call.bind(this));
-        // If the local storage has the values, fill the fields
-        const phoneConfigString = localStorage.getItem("phoneConfig");
-        console.log("xxxx phoneConfigString: " + phoneConfigString);
-        if (phoneConfigString) {
-            const phoneConfig = JSON.parse(phoneConfigString);
-            this.displayNameInput.value = phoneConfig.displayName;
-            this.usernameInput.value = phoneConfig.username;
-            this.passwordInput.value = phoneConfig.password;
-            this.domainInput.value = phoneConfig.domain;
-            this.serverInput.value = phoneConfig.server;
-            this.targetAORInput.value = phoneConfig.targetAOR;
-        }
-    }
-    hasAllRequiredFields() {
-        return (this.displayNameInput.value &&
-            this.usernameInput.value &&
-            this.passwordInput.value &&
-            this.domainInput.value &&
-            this.serverInput.value &&
-            this.targetAORInput.value);
+        this.loadConfig();
     }
     connect() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("Connecting...");
             if (this.hasAllRequiredFields()) {
-                const phoneConfig = {
-                    displayName: this.displayNameInput.value,
-                    username: this.usernameInput.value,
-                    password: this.passwordInput.value,
-                    domain: this.domainInput.value,
-                    server: this.serverInput.value,
-                    targetAOR: this.targetAORInput.value
-                };
-                localStorage.setItem("phoneConfig", JSON.stringify(phoneConfig));
+                this.saveConfig();
             }
             else {
                 window.alert("All fields are required.");
             }
             if (this.simpleUser) {
                 // Dispose the current simple user and create a new one
-                this.simpleUser.unregister();
-                this.simpleUser.disconnect();
+                yield this.simpleUser.unregister();
+                yield this.simpleUser.disconnect();
                 this.simpleUser = null;
             }
             const delegate = {
                 onCallReceived: () => __awaiter(this, void 0, void 0, function* () {
-                    console.log('Incoming Call!');
+                    console.log("Incoming Call!");
                     yield this.simpleUser.answer();
                     this.callButton.textContent = "Hangup";
                 }),
                 onCallAnswered: () => {
-                    console.log('Call Answered!');
+                    console.log("Call Answered!");
                     this.callButton.textContent = "Hangup";
                 },
                 onCallHangup: () => {
-                    console.log('Call Hangup!');
+                    console.log("Call Hangup!");
                     this.callButton.textContent = "Call";
                 },
                 onRegistered: () => {
-                    console.log('Registered!');
+                    console.log("Registered!");
                     this.registerButton.textContent = "Unregister";
                 },
                 onUnregistered: () => {
-                    console.log('Unregistered!');
+                    console.log("Unregistered!");
                     this.registerButton.textContent = "Register";
                 },
                 onServerDisconnect: () => {
-                    console.log('Server Disconnect!');
+                    console.log("Server Disconnect!");
                     this.registerButton.disabled = true;
                     this.callButton.disabled = true;
                     this.connectButton.disabled = false;
+                },
+                onServerConnect: () => {
+                    console.log("Server Connect!");
+                    this.registerButton.disabled = false;
+                    this.callButton.disabled = false;
+                    this.connectButton.disabled = true;
                 }
             };
             const options = {
                 aor: "sip:" + this.usernameInput.value + "@" + this.domainInput.value,
                 delegate: delegate,
                 media: {
-                    constraints: { audio: true, video: false },
-                    remote: { audio: (0, utils_1.getAudioElement)("remoteAudio") }
+                    constraints: { audio: true, video: true },
+                    remote: {
+                        audio: (0, utils_1.getAudioElement)("remoteAudio"),
+                        video: (0, utils_1.getVideoElement)("remoteVideo")
+                    }
                 },
                 userAgentOptions: {
                     displayName: this.displayNameInput.value,
-                    authorizationUsername: this.usernameInput.value,
+                    authorizationUsername: this.authorizationUserInput.value,
                     authorizationPassword: this.passwordInput.value,
+                    allowLegacyNotifications: false,
+                    transportOptions: {
+                        server: this.serverInput.value,
+                        keepAliveInterval: 15
+                    }
+                    // hackIpInContact: true
+                },
+                registererOptions: {
+                    expires: 3600
                 }
             };
             const server = this.serverInput.value;
@@ -123,7 +115,7 @@ class Phone {
                 this.callButton.disabled = false;
             }
             catch (error) {
-                alert("Error: " + error);
+                window.alert("Error: " + error);
             }
         });
     }
@@ -133,13 +125,7 @@ class Phone {
             try {
                 if (this.registerButton.textContent === "Register") {
                     // Register to receive inbound calls
-                    yield this.simpleUser.register({
-                        requestOptions: {
-                            extraHeaders: [
-                                `Expires: 600`
-                            ]
-                        }
-                    });
+                    yield this.simpleUser.register();
                 }
                 else {
                     yield this.simpleUser.unregister();
@@ -166,6 +152,40 @@ class Phone {
             }
         });
     }
+    hasAllRequiredFields() {
+        return (this.displayNameInput.value &&
+            this.usernameInput.value &&
+            this.authorizationUserInput.value &&
+            this.passwordInput.value &&
+            this.domainInput.value &&
+            this.serverInput.value &&
+            this.targetAORInput.value);
+    }
+    loadConfig() {
+        const phoneConfigString = localStorage.getItem("phoneConfig");
+        if (phoneConfigString) {
+            const phoneConfig = JSON.parse(phoneConfigString);
+            this.displayNameInput.value = phoneConfig.displayName;
+            this.usernameInput.value = phoneConfig.username;
+            this.authorizationUserInput.value = phoneConfig.authorizationUser;
+            this.passwordInput.value = phoneConfig.password;
+            this.domainInput.value = phoneConfig.domain;
+            this.serverInput.value = phoneConfig.server;
+            this.targetAORInput.value = phoneConfig.targetAOR;
+        }
+    }
+    saveConfig() {
+        const phoneConfig = {
+            displayName: this.displayNameInput.value,
+            username: this.usernameInput.value,
+            authorizationUser: this.authorizationUserInput.value,
+            password: this.passwordInput.value,
+            domain: this.domainInput.value,
+            server: this.serverInput.value,
+            targetAOR: this.targetAORInput.value
+        };
+        localStorage.setItem("phoneConfig", JSON.stringify(phoneConfig));
+    }
 }
-const phone = new Phone();
+new Phone();
 //# sourceMappingURL=phone.js.map
