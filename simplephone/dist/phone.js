@@ -93,7 +93,7 @@ class Phone {
                 },
                 userAgentOptions: {
                     displayName: this.displayNameInput.value,
-                    authorizationUsername: this.authorizationUserInput.value,
+                    authorizationUsername: this.authorizationUserInput.value || this.usernameInput.value,
                     authorizationPassword: this.passwordInput.value,
                     allowLegacyNotifications: false,
                     transportOptions: {
@@ -155,7 +155,6 @@ class Phone {
     hasAllRequiredFields() {
         return (this.displayNameInput.value &&
             this.usernameInput.value &&
-            this.authorizationUserInput.value &&
             this.passwordInput.value &&
             this.domainInput.value &&
             this.serverInput.value &&
