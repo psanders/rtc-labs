@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  routr:
+    image: fonoster/routr-one:latest
+    environment:
+      EXTERNAL_ADDRS: ${DOCKER_HOST_ADDRESS}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost", "-U", "postgres"]
+      interval: 5s
+    ports:
+      - 51908:51908
+      - 5062:5062
+      - 5432:5432
+    expose:
+      - 5432
+    volumes:
+      - ./etc/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+
+  simplephone:
+    image: psanders/simplephone:latest
+    environment:
+      NODE_ENV: production
+    ports:
+      - 8080:8080
+
+  # The restore-db service is used to restore the database from a backup file
+  # The following command was used to create the backup file:
+  #   pg_dump -h localhost -U postgres routr --data-only -f db.sql
+  # 
+  # (You only need to run this service once to restore the database
+  restore-db:
+    image: postgres:16-alpine
+    entrypoint: ["/bin/sh", "-c", "psql -h routr -U postgres routr -f /db.sql"]
+    volumes:
+      - ./etc/db.sql:/db.sql
+    depends_on:
+      routr:
+        condition: service_healthy
+  
