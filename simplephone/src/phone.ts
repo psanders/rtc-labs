@@ -139,6 +139,9 @@ class Phone {
       } else {
         await this.simpleUser.unregister();
       }
+
+      // Save the phone config to local storage
+      this.saveConfig();
     } catch (error) {
       alert("Error: " + error);
     }
