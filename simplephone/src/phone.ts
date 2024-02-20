@@ -94,10 +94,9 @@ class Phone {
       aor: "sip:" + this.usernameInput.value + "@" + this.domainInput.value,
       delegate: delegate,
       media: {
-        constraints: { audio: true, video: true },
+        constraints: { audio: true, video: false },
         remote: {
-          audio: getAudioElement("remoteAudio"),
-          video: getVideoElement("remoteVideo")
+          audio: getAudioElement("remoteAudio")
         }
       },
       userAgentOptions: {

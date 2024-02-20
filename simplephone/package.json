@@ -4,6 +4,7 @@
   "description": "A WebRTC phone based on sip.js for testing",
   "main": "dist/index",
   "types": "dist/index",
+  "license": "MIT",
   "scripts": {
     "start": "serve -s public -l 8080",
     "build": "tsc && webpack --progress --config webpack.config.cjs"
