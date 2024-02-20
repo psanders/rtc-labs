@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="utf-8" />
+  <title>SimplePhone</title>
+  <style>
+    h1 {
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    input {
+      width: 230px;
+    }
+
+    td {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 400;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>SimplePhone</h1>
+  <table>
+    <tr>
+      <td>Display Name:</td>
+      <td>
+        <input type="text" id="displayNameInput" placeholder="John Doe" />
+      </td>
+    </tr>
+    <tr>
+      <td> Username:</td>
+      <td>
+        <input type="text" id="usernameInput" placeholder="1001" />
+      </td>
+    </tr>
+    <tr>
+      <td>Password:</td>
+      <td>
+        <input type="password" id="passwordInput" />
+      </td>
+    </tr>
+    <tr>
+      <td>Domain:</td>
+      <td>
+        <input type="text" id="domainInput" placeholder="sip.local" />
+      </td>
+    </tr>
+    <tr>
+      <td>Signal Server:</td>
+      <td>
+        <input type="text" id="serverInput" placeholder="ws://sip.local:5062" />
+      </td>
+    </tr>
+    <tr>
+      <td>Target AOR:</td>
+      <td>
+        <input type="text" id="targetAORInput" placeholder="sip:1002@sip.local" />
+      </td>
+    </tr>
+  </table>
+
+  <br />
+
+  <button id="connectButton">Save and connect</button>
+  <button id="registerButton">Register</button>
+  <button id="callButton">Call</button>
+
+  <audio style="display: none" id="remoteAudio" controls>
+    <p>Your browser doesn't support HTML5 audio.</p>
+  </audio>
+  <script src="lib/phone.js"
+    onerror="alert('Unable to load phone.js. Make sure you are serving this file from a web server.')">
+    </script>
+</body>
+
+</html>

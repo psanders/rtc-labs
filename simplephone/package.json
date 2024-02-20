@@ -1,0 +1,21 @@
+{
+  "name": "test-phone",
+  "version": "0.1.0",
+  "description": "Test WebRTC phone",
+  "main": "dist/index",
+  "types": "dist/index",
+  "scripts": {
+    "start": "http-server public -o -c10",
+    "build": "tsc && webpack --progress --config webpack.config.cjs"
+  },
+  "dependencies": {
+    "sip.js": "0.21.2"
+  },
+  "devDependencies": {
+    "@types/node": "^14.11.1",
+    "http-server": "^14.1.1",
+    "typescript": "^4.8.4",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.4"
+  }
+}
