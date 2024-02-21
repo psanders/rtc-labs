@@ -31,14 +31,14 @@ For John Doe:
 - Username: 1001
 - Password: 1234
 - Domain: sip.local
-- Signal Server: `ws://localhost:5052`
+- Signal Server: `ws://localhost:5062`
 
 For Jane Doe:
 
 - Username: 1002
 - Password: 1234
 - Domain: sip.local
-- Signal Server: `ws://localhost:5052`
+- Signal Server: `ws://localhost:5062`
 
 ## Making a call
 
