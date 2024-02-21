@@ -20,8 +20,6 @@ Be sure to change the `DOCKER_HOST_ADDRESS` environment variable to the IP addre
 
 In addition to Routr, the previous command will start two WebRTC client at [http://localhost:8080](http://localhost:8080). You must open two different browsers to simulate two different clients.
 
-## Configuring Routr
-
 ## Setting the clients
 
 When ask for credentials, use the following:
