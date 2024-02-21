@@ -31,14 +31,14 @@ For John Doe:
 - Username: 1001
 - Password: 1234
 - Domain: sip.local
-- Signal Server: `ws://localhost:5052`
+- Signal Server: `ws://localhost:5062`
 
 For Jane Doe:
 
 - Username: 1002
 - Password: 1234
 - Domain: sip.local
-- Signal Server: `ws://localhost:5052`
+- Signal Server: `ws://localhost:5062`
 
 ## Making a call
 
@@ -46,4 +46,5 @@ To make a call please use the `Target AOR` field. For example, to call Jane, ent
 
 ## Getting help
 
-If you have a bug report, please file an issue in this repository's Issue Tracker. For questions or feedback, please join Fonoster's community on [Discord](https://discord.com/invite/mpWSRUhG7e).
+=======
+If you have a bug report, please file an issue in this repository's Issue Tracker. For questions or feedback, please join Fonoster's community on [Discord](https://discord.gg/4QWgSz4hTC).
