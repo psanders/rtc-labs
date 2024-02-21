@@ -8,7 +8,7 @@ I'm just getting started with this, so there's only one lab at the moment.
 
 I'll be adding more soon.
 
-- [WebRTC Network with SIP.js and routr](webrtc_network_with_sipjs_and_routr)
+- [WebRTC Network with SIP.js and Routr](webrtc_network_with_sipjs_and_routr)
 
 ## Support my work
 
