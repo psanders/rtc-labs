@@ -102,7 +102,7 @@ class Phone {
                     // hackIpInContact: true
                 },
                 registererOptions: {
-                    expires: 3600
+                    expires: 120
                 }
             };
             const server = this.serverInput.value;
