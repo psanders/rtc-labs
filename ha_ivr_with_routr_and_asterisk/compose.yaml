@@ -34,7 +34,7 @@ services:
       SIPPROXY_SECRET: asterisk
     volumes:
       - ./extensions.conf:/etc/asterisk/extensions.conf
-      - ./sounds/count-1.sln16:/var/lib/asterisk/sounds/count.sln16
+      - ./sounds/count_1.sln16:/var/lib/asterisk/sounds/count.sln16
 
   asterisk-02:
     image: fonoster/mediaserver:latest
@@ -47,7 +47,7 @@ services:
       SIPPROXY_SECRET: asterisk
     volumes:
       - ./extensions.conf:/etc/asterisk/extensions.conf
-      - ./sounds/count-2.sln16:/var/lib/asterisk/sounds/count.sln16
+      - ./sounds/count_2.sln16:/var/lib/asterisk/sounds/count.sln16
 
   simplephone:
     image: psanders/simplephone:latest
