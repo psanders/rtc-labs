@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Video Feed</title>
+  <style>
+    h1 { font-family: 'Courier New', Courier, monospace; }
+  </style>
+</head>
+
+<body>
+  <h1>Door Phone Video Feed</h1>
+  <div style="border: 1px solid black;  width: 300px; height: 300px;">
+    <video id="remoteVideo" autoplay muted style="background-color: black; height: 100%"></video>
+  </div>
+
+  <br />
+
+  <button id="callButton">Call Door Phone</button>
+  <button id="hangupButton">Hangup</button>
+
+  <audio style="display: none" id="remoteAudio" controls>
+    <p>Your browser doesn't support HTML5 audio.</p>
+  </audio>
+  <script type="module">
+    import { Web } from "https://unpkg.com/sip.js@0.21.2/lib/index.js";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const remoteVideo = document.getElementById('remoteVideo');
+      const callButton = document.getElementById('callButton');
+      const hangupButton = document.getElementById('hangupButton');
+      const remoteAudio = document.getElementById('remoteAudio');
+
+      const config = {
+        server: "ws://localhost:5062",
+        aor:  "sip:admin@sip.local",
+        doorPhoneAor: "sip:doorphone1@sip.local"
+      }
+
+      const options = {
+        aor: config.aor,
+        media: {
+          constraints: { audio: true, video: true },
+          remote: {
+            audio: remoteAudio,
+            video: remoteVideo
+          }
+        },
+        userAgentOptions: {
+          authorizationUsername: "admin",
+          authorizationPassword: "1234",
+        }
+      };
+
+      const simpleUser = new Web.SimpleUser(config.server, options);
+
+      callButton.addEventListener('click', async() => {
+        await simpleUser.connect();
+        simpleUser.call(config.doorPhoneAor);
+      });
+
+      hangupButton.addEventListener('click', () => {
+        simpleUser.hangup();
+      });
+    });
+  </script>
+</body>
+
+</html>

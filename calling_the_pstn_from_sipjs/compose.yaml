@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  routr:
+    image: fonoster/routr-one:latest
+    environment:
+      EXTERNAL_ADDRS: ${DOCKER_HOST_ADDRESS}
+      RTPENGINE_HOST: rtpengine
+    ports: 
+      - 51908:51908
+      - 5060:5060
+      - 5060:5060/udp
+      - 5062:5062
+    volumes:
+      - shared:/var/lib/postgresql/data
+
+  # RTPEngine requires of network mode "host" to work properly. However, this option doesn't work on 
+  # Windows and MacOs. For development, we are opening a few ports to the host machine. 
+  # For production, you must use the network_mode: host which works on Linux.
+  rtpengine:
+    image: fonoster/rtpengine:latest
+    restart: unless-stopped
+    # Uncomment the following line for production
+    # network_mode: host
+    environment:
+      # Set DOCKER_HOST_ADDRESS to an IP address that is reachable to the SIP clients
+      PUBLIC_IP: ${DOCKER_HOST_ADDRESS}
+      PORT_MIN: 10000
+      PORT_MAX: 10100
+      LOG_LEVEL: 6
+    ports:
+      - 22222:22222/udp
+      - 10000-10100:10000-10100/udp
+
+volumes:
+  shared:

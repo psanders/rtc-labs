@@ -1,0 +1,58 @@
+version: "3"
+
+services:
+  routr:
+    image: fonoster/routr-one:2.7.0
+    environment:
+      EXTERNAL_ADDRS: ${DOCKER_HOST_ADDRESS}
+      RTPENGINE_HOST: rtpengine
+    ports:
+      - 51908:51908
+      - 5060:5060
+      - 5062:5062
+    volumes:
+      - shared:/var/lib/postgresql/data
+
+  rtpengine:
+    image: fonoster/rtpengine:latest
+    ports:
+      - 22222:22222/udp
+      - 10000-10100:10000-10100/udp
+    environment:
+      PUBLIC_IP: ${DOCKER_HOST_ADDRESS} 
+      PORT_MIN: 10000
+      PORT_MAX: 10100
+
+  asterisk-01:
+    image: fonoster/mediaserver:latest
+    expose:
+      - 6060
+    environment:
+      EXTERN_ADDR: ${DOCKER_HOST_ADDRESS}
+      SIPPROXY_HOST: routr
+      SIPPROXY_USERNAME: asterisk
+      SIPPROXY_SECRET: asterisk
+    volumes:
+      - ./extensions.conf:/etc/asterisk/extensions.conf
+      - ./sounds/count-1.sln16:/var/lib/asterisk/sounds/count.sln16
+
+  asterisk-02:
+    image: fonoster/mediaserver:latest
+    expose:
+      - 6060
+    environment:
+      EXTERN_ADDR: ${DOCKER_HOST_ADDRESS}
+      SIPPROXY_HOST: routr
+      SIPPROXY_USERNAME: asterisk
+      SIPPROXY_SECRET: asterisk
+    volumes:
+      - ./extensions.conf:/etc/asterisk/extensions.conf
+      - ./sounds/count-2.sln16:/var/lib/asterisk/sounds/count.sln16
+
+  simplephone:
+    image: psanders/simplephone:latest
+    ports:
+      - 8080:8080
+
+volumes:
+  shared:
