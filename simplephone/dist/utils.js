@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPhoneConfig = exports.getInput = exports.getVideoElement = exports.getAudioElement = exports.getButton = void 0;
+exports.getPhoneConfig = exports.getInput = exports.getAudioElement = exports.getButton = void 0;
 function getElement(id) {
     const el = document.getElementById(id);
     if (!el) {
@@ -24,14 +24,6 @@ function getAudioElement(id) {
     return el;
 }
 exports.getAudioElement = getAudioElement;
-function getVideoElement(id) {
-    const el = getElement(id);
-    if (!(el instanceof HTMLVideoElement)) {
-        throw new Error(`Element "${id}" not found or not a video element.`);
-    }
-    return el;
-}
-exports.getVideoElement = getVideoElement;
 function getInput(id) {
     const el = getElement(id);
     if (!(el instanceof HTMLInputElement)) {
@@ -48,6 +40,7 @@ function getPhoneConfig() {
         password: getInput("password").value,
         domain: getInput("domain").value,
         server: getInput("server").value,
+        extraHeadersInput: getInput("extraHeadersInput").value === "" ? [] : getInput("extraHeadersInput").value.split(","),
         audioElementId: "remoteAudio"
     };
 }

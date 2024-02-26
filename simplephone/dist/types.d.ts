@@ -6,4 +6,5 @@ export interface PhoneConfig {
     password: string;
     audioElementId: string;
     server: string;
+    extraHeadersInput: string[];
 }

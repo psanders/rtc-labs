@@ -13,6 +13,9 @@ const sip_js_1 = require("sip.js");
 const utils_1 = require("./utils");
 class Phone {
     constructor() {
+        this.getExtraHeaders = () => {
+            return this.extraHeadersInput.value === "" ? [] : this.extraHeadersInput.value.split(",");
+        };
         this.connectButton = (0, utils_1.getButton)("connectButton");
         this.registerButton = (0, utils_1.getButton)("registerButton");
         this.callButton = (0, utils_1.getButton)("callButton");
@@ -23,6 +26,7 @@ class Phone {
         this.domainInput = (0, utils_1.getInput)("domainInput");
         this.serverInput = (0, utils_1.getInput)("serverInput");
         this.targetAORInput = (0, utils_1.getInput)("targetAORInput");
+        this.extraHeadersInput = (0, utils_1.getInput)("extraHeadersInput");
         this.remoteAudio = (0, utils_1.getAudioElement)("remoteAudio");
         this.registerButton.disabled = true;
         this.callButton.disabled = true;
@@ -34,12 +38,8 @@ class Phone {
     connect() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("Connecting...");
-            if (this.hasAllRequiredFields()) {
-                this.saveConfig();
-            }
-            else {
-                window.alert("All fields are required.");
-            }
+            // Attempt to save the current configuration
+            this.saveConfig();
             if (this.simpleUser) {
                 // Dispose the current simple user and create a new one
                 yield this.simpleUser.unregister();
@@ -97,12 +97,12 @@ class Phone {
                     allowLegacyNotifications: false,
                     transportOptions: {
                         server: this.serverInput.value,
-                        keepAliveInterval: 15
-                    }
-                    // hackIpInContact: true
+                        keepAliveInterval: 15,
+                    },
                 },
                 registererOptions: {
-                    expires: 120
+                    expires: 120,
+                    extraHeaders: this.getExtraHeaders()
                 }
             };
             const server = this.serverInput.value;
@@ -122,6 +122,8 @@ class Phone {
         return __awaiter(this, void 0, void 0, function* () {
             console.log("Registering...");
             try {
+                // Attempt to save the current configuration
+                this.saveConfig();
                 if (this.registerButton.textContent === "Register") {
                     // Register to receive inbound calls
                     yield this.simpleUser.register();
@@ -129,8 +131,6 @@ class Phone {
                 else {
                     yield this.simpleUser.unregister();
                 }
-                // Save the phone config to local storage
-                this.saveConfig();
             }
             catch (error) {
                 alert("Error: " + error);
@@ -142,7 +142,9 @@ class Phone {
             console.log("Calling...");
             try {
                 if (this.callButton.textContent === "Call") {
-                    yield this.simpleUser.call(this.targetAORInput.value);
+                    yield this.simpleUser.call(this.targetAORInput.value, {
+                        extraHeaders: this.getExtraHeaders()
+                    });
                 }
                 else {
                     yield this.simpleUser.hangup();
@@ -162,6 +164,7 @@ class Phone {
             this.targetAORInput.value);
     }
     loadConfig() {
+        var _a;
         const phoneConfigString = localStorage.getItem("phoneConfig");
         if (phoneConfigString) {
             const phoneConfig = JSON.parse(phoneConfigString);
@@ -172,9 +175,14 @@ class Phone {
             this.domainInput.value = phoneConfig.domain;
             this.serverInput.value = phoneConfig.server;
             this.targetAORInput.value = phoneConfig.targetAOR;
+            this.extraHeadersInput.value = (_a = phoneConfig.externalHeaders) === null || _a === void 0 ? void 0 : _a.join(",");
         }
     }
     saveConfig() {
+        if (!this.hasAllRequiredFields()) {
+            window.alert("All fields are required.");
+            return;
+        }
         const phoneConfig = {
             displayName: this.displayNameInput.value,
             username: this.usernameInput.value,
@@ -182,7 +190,8 @@ class Phone {
             password: this.passwordInput.value,
             domain: this.domainInput.value,
             server: this.serverInput.value,
-            targetAOR: this.targetAORInput.value
+            targetAOR: this.targetAORInput.value,
+            externalHeaders: this.getExtraHeaders()
         };
         localStorage.setItem("phoneConfig", JSON.stringify(phoneConfig));
     }

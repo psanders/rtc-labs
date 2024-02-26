@@ -1,5 +1,5 @@
 import { Web } from "sip.js";
-import { getAudioElement, getButton, getInput, getVideoElement } from "./utils";
+import { getAudioElement, getButton, getInput } from "./utils";
 
 class Phone {
   connectButton: HTMLButtonElement;
@@ -13,6 +13,7 @@ class Phone {
   serverInput: HTMLInputElement;
   targetAORInput: HTMLInputElement;
   remoteAudio: HTMLAudioElement;
+  extraHeadersInput: HTMLInputElement;
   simpleUser: Web.SimpleUser;
 
   constructor() {
@@ -26,6 +27,7 @@ class Phone {
     this.domainInput = getInput("domainInput");
     this.serverInput = getInput("serverInput");
     this.targetAORInput = getInput("targetAORInput");
+    this.extraHeadersInput = getInput("extraHeadersInput");
     this.remoteAudio = getAudioElement("remoteAudio");
 
     this.registerButton.disabled = true;
@@ -38,14 +40,15 @@ class Phone {
     this.loadConfig();
   }
 
+  getExtraHeaders = () => {
+    return this.extraHeadersInput.value === "" ? [] : this.extraHeadersInput.value.split(",");
+  }
+
   async connect() {
     console.log("Connecting...");
 
-    if (this.hasAllRequiredFields()) {
-      this.saveConfig();
-    } else {
-      window.alert("All fields are required.");
-    }
+    // Attempt to save the current configuration
+    this.saveConfig();
 
     if (this.simpleUser) {
       // Dispose the current simple user and create a new one
@@ -106,12 +109,12 @@ class Phone {
         allowLegacyNotifications: false,
         transportOptions: {
           server: this.serverInput.value,
-          keepAliveInterval: 15
-        }
-        // hackIpInContact: true
+          keepAliveInterval: 15,
+        },
       },
       registererOptions: {
-        expires: 120
+        expires: 120,
+        extraHeaders: this.getExtraHeaders()
       }
     };
 
@@ -132,15 +135,15 @@ class Phone {
     console.log("Registering...");
 
     try {
+      // Attempt to save the current configuration
+      this.saveConfig();
+
       if (this.registerButton.textContent === "Register") {
         // Register to receive inbound calls
         await this.simpleUser.register();
       } else {
         await this.simpleUser.unregister();
       }
-
-      // Save the phone config to local storage
-      this.saveConfig();
     } catch (error) {
       alert("Error: " + error);
     }
@@ -151,7 +154,9 @@ class Phone {
 
     try {
       if (this.callButton.textContent === "Call") {
-        await this.simpleUser.call(this.targetAORInput.value);
+        await this.simpleUser.call(this.targetAORInput.value, {
+          extraHeaders: this.getExtraHeaders()
+        })
       } else {
         await this.simpleUser.hangup();
       }
@@ -183,10 +188,16 @@ class Phone {
       this.domainInput.value = phoneConfig.domain;
       this.serverInput.value = phoneConfig.server;
       this.targetAORInput.value = phoneConfig.targetAOR;
+      this.extraHeadersInput.value = phoneConfig.externalHeaders?.join(",");
     }
   }
 
   saveConfig() {
+    if (!this.hasAllRequiredFields()) {
+      window.alert("All fields are required.");
+      return;
+    }
+
     const phoneConfig = {
       displayName: this.displayNameInput.value,
       username: this.usernameInput.value,
@@ -194,8 +205,10 @@ class Phone {
       password: this.passwordInput.value,
       domain: this.domainInput.value,
       server: this.serverInput.value,
-      targetAOR: this.targetAORInput.value
+      targetAOR: this.targetAORInput.value,
+      externalHeaders: this.getExtraHeaders()
     };
+
     localStorage.setItem("phoneConfig", JSON.stringify(phoneConfig));
   }
 }
