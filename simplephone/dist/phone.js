@@ -91,7 +91,7 @@ class Phone {
                     }
                 },
                 userAgentOptions: {
-                    displayName: this.displayNameInput.value,
+                    displayName: this.displayNameInput.value || "Anonymous",
                     authorizationUsername: this.authorizationUserInput.value || this.usernameInput.value,
                     authorizationPassword: this.passwordInput.value,
                     allowLegacyNotifications: false,
@@ -156,9 +156,7 @@ class Phone {
         });
     }
     hasAllRequiredFields() {
-        return (this.displayNameInput.value &&
-            this.usernameInput.value &&
-            this.passwordInput.value &&
+        return (this.usernameInput.value &&
             this.domainInput.value &&
             this.serverInput.value &&
             this.targetAORInput.value);
@@ -180,7 +178,7 @@ class Phone {
     }
     saveConfig() {
         if (!this.hasAllRequiredFields()) {
-            window.alert("All fields are required.");
+            window.alert("The following fields are required: Username, Domain, Signal Server, and Target AOR");
             return;
         }
         const phoneConfig = {
