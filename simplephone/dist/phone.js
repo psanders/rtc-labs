@@ -101,7 +101,7 @@ class Phone {
                     },
                 },
                 registererOptions: {
-                    expires: 120,
+                    expires: 15,
                     extraHeaders: this.getExtraHeaders()
                 }
             };

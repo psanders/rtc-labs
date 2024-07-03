@@ -113,7 +113,8 @@ class Phone {
         },
       },
       registererOptions: {
-        expires: 120,
+        expires: 15,
+        refreshFrequency: 70,
         extraHeaders: this.getExtraHeaders()
       }
     };
